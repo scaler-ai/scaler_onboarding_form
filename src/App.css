@@ -64,29 +64,29 @@
   gap: clamp(18px, 2.2vw, 30px);
 }
 
-.form-shell .field-grid--layout > .field--layout.field--xs {
+.form-shell .field-grid--layout>.field--layout.field--xs {
   grid-column: span 3;
 }
 
-.form-shell .field-grid--layout > .field--layout.field--small {
+.form-shell .field-grid--layout>.field--layout.field--small {
   grid-column: span 6;
 }
 
-.form-shell .field-grid--layout > .field--layout.field--medium {
+.form-shell .field-grid--layout>.field--layout.field--medium {
   grid-column: span 9;
 }
 
-.form-shell .field-grid--layout > .field--layout.field--long {
+.form-shell .field-grid--layout>.field--layout.field--long {
   grid-column: span 12;
 }
 
-.form-shell .field-grid--layout > .field.full {
+.form-shell .field-grid--layout>.field.full {
   grid-column: 1 / -1;
 }
 
 /* Stack all layout-width fields in one column (tablet + phone) */
 @media (max-width: 1200px) {
-  .form-shell .field-grid--layout > .field {
+  .form-shell .field-grid--layout>.field {
     grid-column: 1 / -1 !important;
   }
 }
@@ -154,7 +154,7 @@
 }
 
 /* Question line under card title — direct child only so option chips are not styled as captions */
-.form-shell .sub-section-card .field > label {
+.form-shell .sub-section-card .field>label {
   display: block;
   margin: 0 0 10px;
   font-size: 13px;
@@ -1197,13 +1197,11 @@
   border: 1px dashed var(--border-light);
   background:
     linear-gradient(135deg, rgba(0, 85, 255, 0.1), rgba(233, 241, 255, 0.95)),
-    repeating-linear-gradient(
-      90deg,
+    repeating-linear-gradient(90deg,
       rgba(255, 255, 255, 0.12) 0,
       rgba(255, 255, 255, 0.12) 22px,
       rgba(255, 255, 255, 0.3) 22px,
-      rgba(255, 255, 255, 0.3) 44px
-    );
+      rgba(255, 255, 255, 0.3) 44px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1302,6 +1300,7 @@
   from {
     transform: translateX(0);
   }
+
   to {
     transform: translateX(calc(-50% - 7px));
   }
@@ -1320,12 +1319,14 @@
 
 .timeline-screen .roadmap-float-btn {
   min-height: 52px;
-  min-width: 220px;
+  min-width: 340px;
+  width: 340px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
   padding: 0 22px;
+  white-space: nowrap;
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.06em;
@@ -1353,7 +1354,85 @@
   color: var(--text-dark);
 }
 
+.timeline-screen .roadmap-float-btn--requested {
+  cursor: default;
+  text-transform: none;
+  letter-spacing: 0.01em;
+}
+
+.timeline-screen .roadmap-float-btn:disabled {
+  opacity: 0.9;
+}
+
+.timeline-screen .roadmap-callback-error {
+  margin: 0;
+  width: min(340px, 100%);
+  align-self: flex-end;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #ad1a1a;
+  background: #fff2f2;
+  border: 1px solid #f4c2c2;
+  padding: 8px 10px;
+}
+
+.timeline-screen .roadmap-popup-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 35;
+  display: grid;
+  place-items: center;
+  background: rgba(7, 13, 24, 0.35);
+  padding: 20px;
+}
+
+.timeline-screen .roadmap-popup {
+  width: min(520px, 100%);
+  border: 1px solid var(--border-light);
+  background: var(--white);
+  box-shadow: 0 16px 40px rgba(7, 13, 24, 0.16);
+  padding: clamp(18px, 3.6vw, 28px);
+}
+
+.timeline-screen .roadmap-popup h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(24px, 4vw, 34px);
+  line-height: 1.05;
+  color: var(--heading);
+}
+
+.timeline-screen .roadmap-popup p {
+  margin: 12px 0 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text);
+}
+
+.timeline-screen .roadmap-popup-button {
+  margin-top: 18px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--text-dark);
+  background: var(--text-dark);
+  color: var(--bg);
+  padding: 0 18px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.timeline-screen .roadmap-popup-button:hover {
+  transform: translateY(-1px);
+}
+
 @media (max-width: 900px) {
+
   /* Center the 1px stroke on the marker column axis (same as desktop’s translateX(-50%) treatment). */
   .timeline-screen .roadmap-timeline::before {
     left: 18px;
@@ -1430,6 +1509,11 @@
   .timeline-screen .roadmap-float-btn {
     min-width: 0;
     width: 100%;
+  }
+
+  .timeline-screen .roadmap-callback-error {
+    width: 100%;
+    align-self: stretch;
   }
 
   .letter-screen .alumni-strip {
@@ -1514,8 +1598,7 @@
 /* --- App-wide mobile: shell, forms, chips, letter, timeline --- */
 @media (max-width: 760px) {
   .state-screen {
-    padding: max(32px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px))
-      max(32px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+    padding: max(32px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(32px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
   }
 
   .state-screen .page {
@@ -1677,7 +1760,7 @@
 
   .timeline-screen .hero {
     background:
-    radial-gradient(circle at 86% 22%, rgba(0, 85, 255, 0.14), transparent 24%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(233, 241, 255, 0.48));
+      radial-gradient(circle at 86% 22%, rgba(0, 85, 255, 0.14), transparent 24%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(233, 241, 255, 0.48));
   }
 }

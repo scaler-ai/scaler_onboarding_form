@@ -4,6 +4,7 @@ export function getInterviewbitFormGroupsPath(label) {
   return `/api/v3/interviewbit_form_groups?search_by=label&label[]=${encodeURIComponent(label)}`;
 }
 export const FORM_SUBMIT_PATH = "/api/v3/interviewbit_form_responses";
+export const REQUEST_CALLBACK_PATH = "/api/v3/mentee-onboarding/request-callback/";
 /** GET `/api/v3/expectation-form/?slug=&course=` and POST `.../submit-form` (same prefix as myinterviewtrainer expectation_setting). */
 export const EXPECTATION_FORM_PATH_PREFIX = "/api/v3/expectation-form";
 export const ONBOARDING_COMPLETED_TRACKING_PATH =
@@ -12,6 +13,7 @@ export const GENERATE_JWT_PATH = "/generate-jwt";
 export const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
 export const TOKEN_AUTH_PATHS = [
   FORM_SUBMIT_PATH,
+  REQUEST_CALLBACK_PATH,
   ONBOARDING_COMPLETED_TRACKING_PATH,
   EXPECTATION_FORM_PATH_PREFIX,
 ];

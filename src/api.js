@@ -3,5 +3,6 @@ export {
   fetchInitialLoadWithCompletionDecision,
   fetchOnboardingFormGroup,
   fetchOnboardingCompletionTracking,
+  requestMenteeOnboardingCallback,
   submitOnboardingForm,
 } from "./api/index";

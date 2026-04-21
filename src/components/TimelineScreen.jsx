@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { requestMenteeOnboardingCallback } from "../api";
 import { publicAsset } from "../utils/publicAsset";
 
 const communityCarouselSlides = [
@@ -205,6 +206,8 @@ const milestones = [
 
 /** Viewport anchor (fraction from top) used to pick which step is "current" while scrolling */
 const ROADMAP_VIEWPORT_ANCHOR = 0.42;
+const CALLBACK_REQUEST_STORAGE_KEY = "timeline_callback_request_count";
+const MAX_CALLBACK_REQUESTS = 3;
 
 function RoadmapOneLiner({ children }) {
   return <p className="roadmap-one-liner">{children}</p>;
@@ -226,10 +229,28 @@ function RoadmapChips({ chips }) {
   );
 }
 
+function requestCallBackCTAText(hasRequestedCallback, isRequestingCallback, hasReachedCallbackLimit) {
+  if (hasRequestedCallback) return "Callback requested, expect a call in 24-48hrs";
+  if (isRequestingCallback) return "Requesting callback...";
+  if (hasReachedCallbackLimit) return "Callback request limit reached";
+  return "Questions? Request a callback";
+}
+
 export function TimelineScreen({ primaryCtaText = "Start this journey" }) {
   const [openId, setOpenId] = useState(null);
   const [activeScrollId, setActiveScrollId] = useState(milestones[0].id);
+  const [isRequestingCallback, setIsRequestingCallback] = useState(false);
+  const [callbackRequestCount, setCallbackRequestCount] = useState(() => {
+    const raw = window.localStorage.getItem(CALLBACK_REQUEST_STORAGE_KEY);
+    const parsed = Number.parseInt(raw || "0", 10);
+    if (!Number.isFinite(parsed) || parsed < 0) return 0;
+    return Math.min(parsed, MAX_CALLBACK_REQUESTS);
+  });
+  const [hasRequestedCallback, setHasRequestedCallback] = useState(false);
+  const [showCallbackPopup, setShowCallbackPopup] = useState(false);
+  const [callbackRequestError, setCallbackRequestError] = useState("");
   const stepRefs = useRef([]);
+  const hasReachedCallbackLimit = callbackRequestCount >= MAX_CALLBACK_REQUESTS;
 
   useEffect(() => {
     const updateActiveFromScroll = () => {
@@ -279,6 +300,35 @@ export function TimelineScreen({ primaryCtaText = "Start this journey" }) {
     if (event.key !== "Enter" && event.key !== " ") return;
     event.preventDefault();
     toggleStep(id);
+  };
+
+  useEffect(() => {
+    if (!showCallbackPopup) return undefined;
+    const closeOnEscape = (event) => {
+      if (event.key === "Escape") setShowCallbackPopup(false);
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [showCallbackPopup]);
+
+  const handleRequestCallback = async () => {
+    if (isRequestingCallback || hasReachedCallbackLimit || hasRequestedCallback) return;
+    setIsRequestingCallback(true);
+    setCallbackRequestError("");
+    try {
+      await requestMenteeOnboardingCallback();
+      setCallbackRequestCount((prev) => {
+        const next = Math.min(prev + 1, MAX_CALLBACK_REQUESTS);
+        window.localStorage.setItem(CALLBACK_REQUEST_STORAGE_KEY, String(next));
+        return next;
+      });
+      setHasRequestedCallback(true);
+      setShowCallbackPopup(true);
+    } catch {
+      setCallbackRequestError("Could not raise callback request. Please try again.");
+    } finally {
+      setIsRequestingCallback(false);
+    }
   };
 
   return (
@@ -410,7 +460,49 @@ export function TimelineScreen({ primaryCtaText = "Start this journey" }) {
         >
           {primaryCtaText} <i className="ph ph-arrow-right" aria-hidden />
         </a>
+        <button
+          type="button"
+          className={`roadmap-float-btn roadmap-float-btn--secondary ${hasRequestedCallback ? "roadmap-float-btn--requested" : ""}`}
+          data-track-id="roadmap_callback_request"
+          onClick={handleRequestCallback}
+          disabled={isRequestingCallback || hasReachedCallbackLimit || hasRequestedCallback}
+        >
+          {requestCallBackCTAText(hasRequestedCallback, isRequestingCallback, hasReachedCallbackLimit)}
+        </button>
+        {callbackRequestError ? (
+          <p className="roadmap-callback-error" role="status" aria-live="polite">
+            {callbackRequestError}
+          </p>
+        ) : null}
       </div>
+      {showCallbackPopup ? (
+        <div
+          className="roadmap-popup-backdrop"
+          role="presentation"
+          onClick={() => setShowCallbackPopup(false)}
+        >
+          <div
+            className="roadmap-popup"
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="roadmap-callback-popup-title"
+            aria-describedby="roadmap-callback-popup-copy"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <h2 id="roadmap-callback-popup-title">Request raised</h2>
+            <p id="roadmap-callback-popup-copy">
+              Your dedicated learning success manager will contact you within 24 - 48hrs
+            </p>
+            <button
+              type="button"
+              className="roadmap-popup-button"
+              onClick={() => setShowCallbackPopup(false)}
+            >
+              Okay
+            </button>
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }

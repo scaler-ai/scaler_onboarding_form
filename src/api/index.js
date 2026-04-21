@@ -3,6 +3,7 @@ import {
   FORM_SUBMIT_PATH,
   INITIAL_LOAD_DATA_PATH,
   ONBOARDING_COMPLETED_TRACKING_PATH,
+  REQUEST_CALLBACK_PATH,
   toUrl,
 } from "./config";
 import { getOnboardingFormGroupLabelV3 } from "../onboardingFormV3Constants";
@@ -79,4 +80,11 @@ export async function fetchOnboardingCompletionTracking() {
     if (message.includes("Request failed (404)")) return null;
     throw error;
   }
+}
+
+export function requestMenteeOnboardingCallback() {
+  return apiFetch(REQUEST_CALLBACK_PATH, {
+    method: "POST",
+    body: JSON.stringify({}),
+  });
 }
