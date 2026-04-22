@@ -4,6 +4,7 @@ import { fetchInitialLoadWithCompletionDecision, fetchOnboardingFormGroup } from
 import { normalizeFormGroup, getTimelineFloatingLabels } from "../formSchema";
 import { oneTimeFetchOptions } from "../constants/queryOptions";
 import { getExpectationParamsFromInitialLoad } from "../expectationSetting/fromInitialLoad";
+import { EXPECTATION_FORM_ENABLED_COURSES } from "../onboardingFormV3Constants";
 
 export function useOnboardingData() {
   const initialQuery = useQuery({
@@ -38,10 +39,12 @@ export function useOnboardingData() {
     [initialLoadData],
   );
 
+  const expectationFormEnabled = EXPECTATION_FORM_ENABLED_COURSES.includes(courseSlug);
+
   return {
     user: initialLoadData?.user_data?.current_user,
     /** For `/api/v3/expectation-form` (slug/course/utm from initial-load `user_data`). */
-    expectationSlug: expectationParams.slug,
+    expectationSlug: expectationFormEnabled && expectationParams.slug,
     expectationCourse: expectationParams.course,
     expectationUtm: expectationParams.utmSource,
     /** True when `/api/v3/action-trackings/mentee_completed_onboarding` returned a completed record (decided with initial load only). */

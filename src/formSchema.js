@@ -407,7 +407,7 @@ export function normalizeFormGroup(formGroupResponse) {
     groupNode?.label ||
     groupNode?.attributes?.label ||
     groupNode?.name ||
-    "Onboarding_Form_Academy_V2";
+    "Onboarding_Form_Academy_V3";
 
   const formGroupMeta = groupNode?.meta || groupNode?.attributes?.meta || {};
 

@@ -1,89 +1,88 @@
 import { publicAsset } from "../utils/publicAsset";
+import { getFinalLetterContent } from "../constants/finalLetterContent";
+import {
+  resolveMajorityExperience,
+  resolveTotalExperience,
+} from "../utils/finalLetterScreen";
 import { getLinkedinAlumni } from "../utils/linkedinAlumni";
 
-function normalizeKey(value) {
-  return String(value ?? "")
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, " ");
+function renderHeadline(template, userName) {
+  return template.replace("{userName}", userName);
 }
 
-function readFormValueByKey(allValues, matchers = []) {
-  if (!allValues || typeof allValues !== "object") return "";
-  const entries = Object.entries(allValues);
-  for (const [rawKey, rawValue] of entries) {
-    const key = normalizeKey(rawKey);
-    if (matchers.some((matcher) => matcher(key))) {
-      return String(rawValue ?? "");
-    }
+function renderMissionSolution(text) {
+  const brandText = "Scaler";
+  const brandStartIndex = text.indexOf(brandText);
+
+  if (brandStartIndex === -1) {
+    return <span>{text}</span>;
   }
-  return "";
+
+  const brandEndIndex = brandStartIndex + brandText.length;
+
+  return (
+    <span>
+      {text.slice(0, brandStartIndex)}
+      <strong>{brandText}</strong>
+      {text.slice(brandEndIndex)}
+    </span>
+  );
 }
 
-function getFieldLabelValue(field, rawValue) {
-  if (rawValue == null) return "";
-  if (!Array.isArray(field?.options) || field.options.length === 0) return String(rawValue);
-  const match = field.options.find((opt) => String(opt?.value) === String(rawValue));
-  return String(match?.label ?? rawValue);
-}
+function renderMissionParagraph(text, key) {
+  const boldText = "strong technical foundations";
+  const boldStartIndex = text.indexOf(boldText);
+  const brandText = "Scaler";
+  const brandStartIndex = text.indexOf(brandText);
 
-function readFormValueByFieldLabel(allValues, screens, expectedLabels = []) {
-  if (!allValues || typeof allValues !== "object" || !Array.isArray(screens)) return "";
-  const labels = new Set(expectedLabels.map((label) => normalizeKey(label)));
-  for (const screen of screens) {
-    for (const field of screen?.fields || []) {
-      if (!labels.has(normalizeKey(field?.label))) continue;
-      const rawValue = allValues[field.id];
-      if (rawValue == null || rawValue === "") continue;
-      return getFieldLabelValue(field, rawValue);
-    }
+  if (boldStartIndex !== -1) {
+    const boldEndIndex = boldStartIndex + boldText.length;
+    return (
+      <p key={key}>
+        {text.slice(0, boldStartIndex)}
+        <strong>{boldText}</strong>
+        {text.slice(boldEndIndex)}
+      </p>
+    );
   }
-  return "";
+
+  if (brandStartIndex !== -1) {
+    const brandEndIndex = brandStartIndex + brandText.length;
+    return (
+      <p key={key}>
+        {text.slice(0, brandStartIndex)}
+        <strong>{brandText}</strong>
+        {text.slice(brandEndIndex)}
+      </p>
+    );
+  }
+
+  return <p key={key}>{text}</p>;
 }
 
-function resolveTotalExperience(allValues, screens) {
-  const byFieldLabel = readFormValueByFieldLabel(allValues, screens, [
-    "Total experience (Full Time)",
-    "Total experience",
-  ]);
-  if (byFieldLabel) return byFieldLabel;
-  return readFormValueByKey(allValues, [
-    (key) => key === "total experience (full time)",
-    (key) => key === "total experience",
-    (key) => key.includes("total experience") && key.includes("full time"),
-  ]);
-}
-
-function resolveMajorityExperience(allValues, screens) {
-  const byFieldLabel = readFormValueByFieldLabel(allValues, screens, [
-    "What has majority of your experience been in?",
-    "Majority experience",
-  ]);
-  if (byFieldLabel) return byFieldLabel;
-  return readFormValueByKey(allValues, [
-    (key) => key === "what has majority of your experience been in?",
-    (key) => key === "majority experience",
-    (key) => key.includes("majority of your experience"),
-  ]);
-}
-
-export function FinalLetterScreen({ user, allValues, screens, onContinue, continueDisabled = false }) {
+export function FinalLetterScreen({
+  user,
+  allValues,
+  screens,
+  formGroupLabel,
+  onContinue,
+  continueDisabled = false,
+}) {
   const userName = user?.name || "Learner";
+  const content = getFinalLetterContent(formGroupLabel);
   const totalExperience = resolveTotalExperience(allValues, screens);
   const majorityExperience = resolveMajorityExperience(allValues, screens);
-  const matchedAlumni = getLinkedinAlumni(totalExperience, majorityExperience);
+  const matchedAlumni = getLinkedinAlumni(totalExperience, majorityExperience, formGroupLabel);
   const alumniPresent = matchedAlumni.length > 0;
   const alumni = matchedAlumni;
 
   return (
     <section className="screen default-screen shell page letter-screen">
       <div className="letter-frame letter-page">
-        <p className="eyebrow letter-eyebrow">Welcome note</p>
-        <h1 className="headline">
-          {userName}, your journey to staying relevant, starts now
-        </h1>
-        <p className="subheadline">(50+ learners have already enrolled, with similar profile like you)</p>
-        {alumniPresent && <p className="subheading">Scaler alumni who had a similar journey as yours</p>}
+        <p className="eyebrow letter-eyebrow">{content.eyebrow}</p>
+        <h1 className="headline">{renderHeadline(content.headline, userName)}</h1>
+        <p className="subheadline">{content.subheadline}</p>
+        {alumniPresent && <p className="subheading">{content.alumniSubheading}</p>}
 
         {alumniPresent && (
           <div className="alumni-strip">
@@ -97,16 +96,20 @@ export function FinalLetterScreen({ user, allValues, screens, onContinue, contin
                   </div>
                 </div>
                 <div className="alumni-journey">
-                  <div className="journey-row">
-                    <div className="journey-label">Before Scaler</div>
-                    <div className="journey-value">{card.before}</div>
-                  </div>
-                  <div className="journey-row">
-                    <div className="journey-label">After Scaler</div>
-                    <div className="org-logo">
-                      <img src={publicAsset(card.logo)} alt={card.company} />
+                  {card.before && (
+                    <div className="journey-row">
+                      <div className="journey-label">{content.alumniJourneyLabels.before}</div>
+                      <div className="journey-value">{card.before}</div>
                     </div>
-                  </div>
+                  )}
+                  {card.logo && (
+                    <div className="journey-row">
+                      <div className="journey-label">{content.alumniJourneyLabels.after}</div>
+                      <div className="org-logo">
+                        <img src={publicAsset(card.logo)} alt={card.company} />
+                      </div>
+                    </div>
+                  )}
                 </div>
               </article>
             ))}
@@ -114,8 +117,8 @@ export function FinalLetterScreen({ user, allValues, screens, onContinue, contin
         )}
 
         <section className="letter-card letter-card--mission">
-          <h2 className="insight-section-title">Scaler&apos;s mission and your future with AI</h2>
-          <p className="insight-section-subtitle">How Scaler helps you stay relevant with AI</p>
+          <h2 className="insight-section-title">{content.mission.title}</h2>
+          <p className="insight-section-subtitle">{content.mission.subtitle}</p>
 
           <section className="insight-grid">
             <article className="insight-panel insight-panel--concerns">
@@ -123,33 +126,17 @@ export function FinalLetterScreen({ user, allValues, screens, onContinue, contin
                 <div className="insight-icon" aria-hidden>
                   <i className="ph ph-user-focus" />
                 </div>
-                <h3>Common conerns around using AI</h3>
+                <h3>{content.mission.concernsTitle}</h3>
               </div>
               <ul className="insight-list">
-                <li>
-                  <span className="insight-bullet" aria-hidden>
-                    <i className="ph ph-x" />
-                  </span>
-                  <span>Outputs are often wrong.</span>
-                </li>
-                <li>
-                  <span className="insight-bullet" aria-hidden>
-                    <i className="ph ph-x" />
-                  </span>
-                  <span>Debugging AI generated code often takes time.</span>
-                </li>
-                <li>
-                  <span className="insight-bullet" aria-hidden>
-                    <i className="ph ph-x" />
-                  </span>
-                  <span>Not sure when to use AI vs Do it myself.</span>
-                </li>
-                <li>
-                  <span className="insight-bullet" aria-hidden>
-                    <i className="ph ph-x" />
-                  </span>
-                  <span>Worry about over dependence.</span>
-                </li>
+                {content.mission.concerns.map((item) => (
+                  <li key={item}>
+                    <span className="insight-bullet" aria-hidden>
+                      <i className="ph ph-x" />
+                    </span>
+                    <span>{item}</span>
+                  </li>
+                ))}
               </ul>
             </article>
 
@@ -159,80 +146,36 @@ export function FinalLetterScreen({ user, allValues, screens, onContinue, contin
                   <img className="insight-logo" src={publicAsset("/Scaler-Logo_White-3.png")} alt="" />
                 </div>
                 <h3>
-                  How <span className="brand-accent">Scaler</span> empowers you for AI era?
+                  {content.mission.scalerTitlePrefix}
+                  <span className="brand-accent">{content.mission.scalerTitleAccent}</span>
+                  {content.mission.scalerTitleSuffix}
                 </h3>
               </div>
               <ul className="insight-list">
-                <li>
-                  <span className="insight-bullet" aria-hidden>
-                    <i className="ph ph-check" />
-                  </span>
-                  <span>
-                    Understand how to prompt, set up evals, use RAG/context correctly, and add guardrails so
-                    AI does not hallucinate.
-                  </span>
-                </li>
-                <li>
-                  <span className="insight-bullet" aria-hidden>
-                    <i className="ph ph-check" />
-                  </span>
-                  <span>
-                    Use AI to validate AI-generated code: LLM-as-a-judge, hidden test cases, second-model
-                    review, quick tests for deterministic outputs, plus monitoring and logging to spot
-                    errors early.
-                  </span>
-                </li>
-                <li>
-                  <span className="insight-bullet" aria-hidden>
-                    <i className="ph ph-check" />
-                  </span>
-                  <span>
-                    Use AI for speed in repeatable work, while your own reasoning leads architecture and
-                    system design.
-                  </span>
-                </li>
-                <li>
-                  <span className="insight-bullet" aria-hidden>
-                    <i className="ph ph-check" />
-                  </span>
-                  <span>
-                    In an AI-first world, foundations matter more than ever. <strong>Scaler</strong> builds
-                    strong engineering principles alongside practical AI application, so you&apos;re not
-                    just keeping up, but staying ahead.
-                  </span>
-                </li>
+                {content.mission.solutions.map((item) => (
+                  <li key={item}>
+                    <span className="insight-bullet" aria-hidden>
+                      <i className="ph ph-check" />
+                    </span>
+                    {renderMissionSolution(item)}
+                  </li>
+                ))}
               </ul>
             </article>
           </section>
 
           <div className="letter-stack letter-stack--mission-close">
-            <h3 className="letter-subtitle">
-              The shift in front of you is not about AI replacing roles. It is about roles changing shape.
-            </h3>
-            <p>
-              AI is becoming a new layer of leverage, and the people who learn to use it will stay
-              relevant. They will be the ones who can identify real problems, build quickly, and ship
-              solutions rapidly, all on top of <strong>strong technical foundations</strong>.
-            </p>
-            <p>
-              That is where <strong>Scaler</strong> comes in. We did not add an AI module. We rebuilt
-              everything. Learning once is not enough anymore. Scaler gives you the pole position in AI
-              today and keeps you there for the next decade with updated curriculum and lifelong access.
-              You are not buying a snapshot of 2025. You are buying a living system that updates as the
-              market moves.
-            </p>
-            <p>
-              It is where you learn how to use AI with judgment, while deepening thinking, problem solving,
-              and long-term technical depth, so you do not just prepare for your next job, you build
-              relevance for every job that comes after it.
-            </p>
+            <h3 className="letter-subtitle">{content.mission.closeTitle}</h3>
+            {content.mission.closeParagraphs.map((paragraph) =>
+              renderMissionParagraph(paragraph, paragraph),
+            )}
           </div>
         </section>
 
         <div className="cta-row letter-cta-row">
           <p className="status-line">
             <i className="ph ph-sparkle" aria-hidden />
-            Your 12-month roadmap is ready next
+            {content.cta.statusLine}
           </p>
           <div className="cta-actions">
             <button
@@ -242,7 +185,7 @@ export function FinalLetterScreen({ user, allValues, screens, onContinue, contin
               onClick={onContinue}
               disabled={continueDisabled}
             >
-              {continueDisabled ? "Loading…" : "View your 12-month roadmap"}{" "}
+              {continueDisabled ? content.cta.loadingLabel : content.cta.buttonLabel}{" "}
               {!continueDisabled ? <i className="ph ph-arrow-right" aria-hidden /> : null}
             </button>
           </div>

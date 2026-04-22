@@ -1,4 +1,12 @@
-export function HomeScreen({ onStart }) {
+import {
+  DEFAULT_HOME_SCREEN_CONTENT,
+  HOME_SCREEN_CONTENT_BY_FORM_GROUP_LABEL,
+} from "../onboardingFormV3Constants";
+
+export function HomeScreen({ formGroupLabel, onStart }) {
+  const content =
+    HOME_SCREEN_CONTENT_BY_FORM_GROUP_LABEL[formGroupLabel] || DEFAULT_HOME_SCREEN_CONTENT;
+
   return (
     <section className="screen default-screen home-screen" id="screen-1">
       <div className="frame welcome-frame">
@@ -9,36 +17,28 @@ export function HomeScreen({ onStart }) {
                 <i className="ph ph-squares-four" aria-hidden />
               </div>
               <div className="step-meta">
-                <div className="step-overline">Built for the AI-first world</div>
-                <div className="step-title">Welcome to Scaler</div>
+                <div className="step-overline">{content.stepOverline}</div>
+                <div className="step-title">{content.stepTitle}</div>
               </div>
             </div>
             <div className="progress">
               <div className="progress-bar" style={{ "--progress": "8%" }}>
                 <span />
               </div>
-              <div className="progress-label">Intro</div>
+              <div className="progress-label">{content.progressLabel}</div>
             </div>
           </div>
 
           <div className="hero-grid welcome-stage">
             <div>
-              <div className="eyebrow">A founder welcome</div>
-              <h2 className="hero-title">
-                The most important skill of this decade is already here. Let&apos;s make sure you&apos;re
-                ready for it.
-              </h2>
-              <p className="hero-copy">
-                We built Scaler because the gap between where professionals are and where AI is taking
-                every industry was becoming unbridgeable without the right training. This program
-                doesn&apos;t just teach you AI. It teaches you how to think, build, and lead in a world
-                shaped by it.
-              </p>
+              <div className="eyebrow">{content.eyebrow}</div>
+              <h2 className="hero-title">{content.heroTitle}</h2>
+              <p className="hero-copy">{content.heroCopy}</p>
               <div className="quote-block">
-                <p className="quote-text">&ldquo;1% better every day.&rdquo;</p>
+                <p className="quote-text">&ldquo;{content.quoteText}&rdquo;</p>
                 <div className="quote-meta">
                   <span className="signature-line" />
-                  Founding team, Scaler
+                  {content.quoteMeta}
                 </div>
               </div>
               <div className="cta-row">
@@ -48,11 +48,11 @@ export function HomeScreen({ onStart }) {
                   data-track-id="home_start_onboarding"
                   onClick={onStart}
                 >
-                  Complete onboarding <i className="ph ph-arrow-right" aria-hidden />
+                  {content.ctaLabel} <i className="ph ph-arrow-right" aria-hidden />
                 </button>
                 <div className="status-line">
                   <i className="ph ph-lock-key" aria-hidden />
-                  A short intake before your dashboard opens
+                  {content.statusLine}
                 </div>
               </div>
             </div>

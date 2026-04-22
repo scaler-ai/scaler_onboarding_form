@@ -151,7 +151,7 @@ function App() {
   }
 
   if (phase === "home") {
-    return <HomeScreen onStart={() => setPhase("form")} />;
+    return <HomeScreen formGroupLabel={formGroupLabel} onStart={() => setPhase("form")} />;
   }
 
   if (phase === "letter") {
@@ -160,6 +160,7 @@ function App() {
         user={user}
         allValues={onboarding.allValues}
         screens={screens}
+        formGroupLabel={formGroupLabel}
         onContinue={handleLetterContinue}
         continueDisabled={false}
       />
@@ -192,9 +193,7 @@ function App() {
   }
 
   if (phase === "timeline") {
-    return (
-      <TimelineScreen primaryCtaText={timelineFloatingCta.primary} />
-    );
+    return <TimelineScreen formGroupLabel={formGroupLabel} primaryCtaText={timelineFloatingCta.primary} />;
   }
 
   if (!onboarding.currentScreen) {

@@ -203,7 +203,39 @@ export function getLinkedinAlumniProfileByIdentifier(nameOrEmail) {
   return profile ? cloneProfile(profile) : null;
 }
 
-export function getLinkedinAlumni(totalExperience, majorityExperience) {
+const ONLINE_MBA_ALUMNI_PROFILES = {
+  namanBhalla: {
+    name: "Naman Bhalla",
+    role: "AI Product Head · Google",
+    before: "Strategy & AI Integration",
+    company: "Google",
+    photo: "https://d2beiqkhq929f0.cloudfront.net/public_assets/assets/000/192/044/original/freepik_make-a-picture-of-img1-pe_2840917494.png?1776858908",
+  },
+  amarSrivastav: {
+    name: "Amar Srivastav",
+    role: "CEO, Online Programs · Scaler",
+    before: "Business Leadership",
+    company: "Scaler",
+    photo: "https://d2beiqkhq929f0.cloudfront.net/public_assets/assets/000/192/043/original/image_%281%29.png?1776858886",
+  },
+  abhinavVijayvargiya: {
+    name: "Abhinav Vijayvargiya",
+    role: "CFO · Swiggy, Khatabook",
+    before: "Finance & Business Performance",
+    company: "Swiggy",
+    photo: "https://d2beiqkhq929f0.cloudfront.net/public_assets/assets/000/192/042/original/image.png?1776858855",
+  },
+};
+
+function onlineMBAAlumni() {
+  return Object.values(ONLINE_MBA_ALUMNI_PROFILES).map((profile) => cloneProfile(profile)).filter(Boolean);
+}
+
+export function getLinkedinAlumni(totalExperience, majorityExperience, formGroupLabel) {
+  if (formGroupLabel === "Onboarding_Form_Online_MBA_V3") {
+    return onlineMBAAlumni();
+  }
+
   const experienceBucket = resolveExperienceBucket(totalExperience);
   const majorityDomain = resolveMajorityDomain(majorityExperience);
 

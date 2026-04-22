@@ -1,208 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { requestMenteeOnboardingCallback } from "../api";
+import { getTimelineContent } from "../constants/timelineContent";
 import { publicAsset } from "../utils/publicAsset";
-
-const communityCarouselSlides = [
-  { src: "https://d2beiqkhq929f0.cloudfront.net/public_assets/assets/000/191/008/original/1.jpeg?1776406756", alt: "Community Highlight " },
-  { src: "https://d2beiqkhq929f0.cloudfront.net/public_assets/assets/000/191/026/original/2.jpeg?1776407883", alt: "Community Highlight " },
-  { src: "https://d2beiqkhq929f0.cloudfront.net/public_assets/assets/000/191/029/original/7_%281%29.jpeg?1776407912", alt: "Community Highlight " },
-  { src: "https://d2beiqkhq929f0.cloudfront.net/public_assets/assets/000/191/032/original/bangalore_meetup.jpeg?1776407933", alt: "Community Highlight " },
-  { src: "https://d2beiqkhq929f0.cloudfront.net/public_assets/assets/000/191/033/original/BLR_feb_1.jpeg?1776407947", alt: "Community Highlight " },
-  { src: "https://d2beiqkhq929f0.cloudfront.net/public_assets/assets/000/191/035/original/Chen_2_feb.jpeg?1776407968", alt: "Community Highlight " },
-  { src: "https://d2beiqkhq929f0.cloudfront.net/public_assets/assets/000/191/036/original/Chen_Feb_1_.jpeg?1776407989", alt: "Community Highlight " },
-  { src: "https://d2beiqkhq929f0.cloudfront.net/public_assets/assets/000/191/037/original/Del_feb_1.jpg?1776408005", alt: "Community Highlight " },
-  { src: "https://d2beiqkhq929f0.cloudfront.net/public_assets/assets/000/191/038/original/Del_feb_2.jpg?1776408027", alt: "Community Highlight " },
-  { src: "https://d2beiqkhq929f0.cloudfront.net/public_assets/assets/000/191/040/original/Delhi_Donation_drive.jpeg?1776408086", alt: "Community Highlight " },
-  { src: "https://d2beiqkhq929f0.cloudfront.net/public_assets/assets/000/191/041/original/Gurgaon_%281%29.jpeg?1776408099", alt: "Community Highlight " },
-  { src: "https://d2beiqkhq929f0.cloudfront.net/public_assets/assets/000/191/043/original/Hyd_feb_1.jpg?1776408162", alt: "Community Highlight " },
-  { src: "https://d2beiqkhq929f0.cloudfront.net/public_assets/assets/000/191/045/original/Hyd_feb_2.jpg?1776408179", alt: "Community Highlight " },
-  { src: "https://d2beiqkhq929f0.cloudfront.net/public_assets/assets/000/191/048/original/Hyderabad.jpeg?1776408197", alt: "Community Highlight " },
-  { src: "https://d2beiqkhq929f0.cloudfront.net/public_assets/assets/000/191/050/original/IMG-20221015-WA0144.jpg?1776408311", alt: "Community Highlight " },
-  { src: "https://d2beiqkhq929f0.cloudfront.net/public_assets/assets/000/191/051/original/IMG-20221016-WA0047.jpg?1776408329", alt: "Community Highlight " },
-  { src: "https://d2beiqkhq929f0.cloudfront.net/public_assets/assets/000/191/052/original/IMG-20221029-WA0088.jpg?1776408358", alt: "Community Highlight " },
-  { src: "https://d2beiqkhq929f0.cloudfront.net/public_assets/assets/000/191/053/original/IMG-20221126-WA0076.jpg?1776408382", alt: "Community Highlight " },
-  { src: "https://d2beiqkhq929f0.cloudfront.net/public_assets/assets/000/191/054/original/IMG-20221225-WA0248.jpg?1776408407", alt: "Community Highlight " },
-  { src: "https://d2beiqkhq929f0.cloudfront.net/public_assets/assets/000/191/056/original/Mumbai_pune.jpeg?1776408434", alt: "Community Highlight " },
-  { src: "https://d2beiqkhq929f0.cloudfront.net/public_assets/assets/000/191/057/original/Untitled_%281%29.jpeg?1776408460", alt: "Community Highlight " },
-  { src: "https://d2beiqkhq929f0.cloudfront.net/public_assets/assets/000/191/058/original/WhatsApp_Image_2022-12-04_at_9.41.45_AM.jpeg?1776408486", alt: "Community Highlight " },
-  { src: "https://d2beiqkhq929f0.cloudfront.net/public_assets/assets/000/191/070/original/community-3.jpeg?1776410569", alt: "Community Highlight " },
-  { src: "https://d2beiqkhq929f0.cloudfront.net/public_assets/assets/000/191/071/original/community-5.jpeg?1776410639", alt: "Community Highlight " },
-  { src: "https://d2beiqkhq929f0.cloudfront.net/public_assets/assets/000/191/072/original/community-6.jpeg?1776410687", alt: "Community Highlight " },
-  { src: "https://d2beiqkhq929f0.cloudfront.net/public_assets/assets/000/191/073/original/community-2.jpg?1776410865", alt: "Community Highlight " },
-];
-
-/** Synced with pipInstallish/Ftue_final roadmap.html (main timeline content). */
-const milestones = [
-  {
-    id: "day-0",
-    time: "Day 0",
-    title: "Meet and Greet session",
-    copy:
-      "Orientation session, features including your 24 x 7 AI companion and clarity on what the year will demand from you.",
-    side: "left",
-    expandable: true,
-    image: "/assets/roadmap/1st-milestone.png",
-    imageTag: "Meet & Greet preview",
-    expandTitle: "Meet and Greet Session",
-  },
-  {
-    id: "day-1",
-    time: "Day 1",
-    title: "First mentor session",
-    copy:
-      "Learners who lock in mentors in Week 1 are 2-3× more likely to get roadmap clarity and hit milestones faster. Top mentor's slots are filling quickly — pick yours now.",
-    side: "right",
-    expandable: true,
-    image: "/assets/roadmap/2nd-milestone.png",
-    imageTag: "Mentor and dashboard preview",
-    expandTitle: "Select a mentor from a pool of Industry veterans and plan your scaler journey",
-  },
-  {
-    id: "day-2",
-    time: "Day 2",
-    title: "First class",
-    copyNode: (
-      <>
-        We didn&apos;t add an AI module. We rebuilt everything. Learn from the <strong>top 1%</strong> in
-        AI. 24x7 <strong>AI companion</strong> for any support.
-      </>
-    ),
-    chips: [{ label: "24x7 AI companion" }, { label: "AI lab sessions" }],
-    side: "left",
-    expandable: true,
-    image: "/assets/roadmap/3rd-milestone-new.png",
-    imageTag: "Class experience preview",
-    expandTitle: "First class",
-  },
-  {
-    id: "month-1-start",
-    time: "Month 1",
-    title: "Start solving problems",
-    copy:
-      "Top performers don't get lucky — they get obsessively consistent. Your live dashboard shows exactly where you stand vs your cohort. Build your performance streak before it builds the gap.",
-    side: "right",
-    expandable: false,
-  },
-  {
-    id: "month-2-resume",
-    time: "Month 2",
-    title: "Build your resume",
-    copy:
-      "99.7% of ATS recruiters use keywords to search, making more than 75% of resumes invisible. Build your resume on Career Hub with AI-optimized, battle-tested templates reviewed by industry experts who've hired at top companies.",
-    side: "left",
-    expandable: false,
-  },
-  {
-    id: "month-1-community",
-    time: "Month 1",
-    title: "Join community events",
-    copy:
-      "Referrals. Inside intel. Real talk from engineers already inside top companies. Your city community is where careers quietly get made — but only if you show up.",
-    side: "right",
-    expandable: true,
-    image: "/assets/roadmap/community.jpeg",
-    imageTag: "Community event preview",
-    expandTitle: "Join community events",
-    carouselSlides: communityCarouselSlides,
-    carouselCaption: "Community event gallery",
-  },
-  {
-    id: "month-3-mock",
-    time: "Month 3",
-    title: "Attempt AI mock interviews",
-    copy:
-      "Practice until a Google L5 loop feels routine. AI feedback in real time. Optional human panels with actual FAANG engineers. Go again, and again.",
-    side: "left",
-    expandable: false,
-  },
-  {
-    id: "month-5-mentor",
-    time: "Month 5",
-    title: "Mentor check-in",
-    copy: "Review progress and help resolve any concerns or feedback regarding your course.",
-    side: "right",
-    expandable: false,
-  },
-  {
-    id: "month-7-track",
-    time: "Month 7",
-    title: "Choose a specialisation track",
-    copy: "Choose between multiple Industry vetted specialisation tracks.",
-    side: "left",
-    expandable: false,
-  },
-  {
-    id: "month-8-mentor",
-    time: "Month 8",
-    title: "Mentor check-in",
-    copy: "Review progress and help resolve any concerns or feedback regarding your course.",
-    side: "right",
-    expandable: false,
-  },
-  {
-    id: "month-10-portfolio",
-    time: "Month 10",
-    title: "Real world portfolio project",
-    copy:
-      "Use learnings for a practical project. Production-grade systems that look like real engineering work on your resume.",
-    side: "left",
-    expandable: false,
-    chips: [{ label: "AI literacy" }],
-  },
-  {
-    id: "month-10-congrats",
-    time: "Month 10",
-    title: "Congrats, now you are industry ready!",
-    copy: "Clear skill certifications and be eligible to apply for all the roles.",
-    side: "right",
-    expandable: false,
-    chips: [
-      { label: "AI infused UI engineer", variant: "ai" },
-      { label: "AI augmented SWE", variant: "ai" },
-      { label: "Multi-modal AI engineer", variant: "ai" },
-      { label: "AI architect", variant: "ai" },
-      { label: "Decision scientist", variant: "ai" },
-      { label: "AI analyst", variant: "ai" },
-      { label: "AI Platform Engineer", variant: "ai" },
-      { label: "Agentic Workflow Designer", variant: "ai" },
-      { label: "GPU Infrastructure Specialist", variant: "ai" },
-      { label: "Semantic Knowledge Engineer", variant: "ai" },
-      { label: "ML systems engineer", variant: "ai" },
-      { label: "Forward deployed engineer", variant: "ai" },
-      { label: "Senior SWE" },
-    ],
-  },
-  {
-    id: "month-10-placement",
-    time: "Month 10",
-    title: "Placement assistance begins",
-    copy:
-      "Clear skill certification rounds at end of core modules and start applying to jobs from over 900+ hiring partners.",
-    side: "left",
-    expandable: true,
-    image: "/assets/roadmap/4th-milestone.png",
-    imageTag: "Careers Hub preview",
-    expandTitle: "Get skills, build your resume and apply to jobs on Careerhub",
-  },
-  {
-    id: "month-11-electives",
-    time: "Month 11",
-    title: "Additional AI electives",
-    copy:
-      "Eligible for GenAI, Product management with AI etc. (Please check your brochures for all updated electives for your programme)",
-    side: "right",
-    expandable: false,
-  },
-  {
-    id: "beyond-y1",
-    time: "Beyond year 1",
-    title: "Your Life long learning partner",
-    copy:
-      "You will have lifetime access to live and existing course material where we are keeping you updated with latest advancements in tech, so your learning continues.",
-    side: "left",
-    expandable: false,
-  },
-];
+import {
+  getInitialCallbackRequestCount,
+  getRequestCallbackCtaText,
+} from "../utils/timelineScreen";
 
 /** Viewport anchor (fraction from top) used to pick which step is "current" while scrolling */
 const ROADMAP_VIEWPORT_ANCHOR = 0.42;
@@ -229,23 +32,18 @@ function RoadmapChips({ chips }) {
   );
 }
 
-function requestCallBackCTAText(hasRequestedCallback, isRequestingCallback, hasReachedCallbackLimit) {
-  if (hasRequestedCallback) return "Callback requested, expect a call in 24-48hrs";
-  if (isRequestingCallback) return "Requesting callback...";
-  if (hasReachedCallbackLimit) return "Callback request limit reached";
-  return "Questions? Request a callback";
-}
-
-export function TimelineScreen({ primaryCtaText = "Start this journey" }) {
+export function TimelineScreen({
+  formGroupLabel,
+  primaryCtaText = "Start this journey",
+}) {
+  const content = getTimelineContent(formGroupLabel);
+  const { hero, milestones, expandPanelLabel, callback } = content;
   const [openId, setOpenId] = useState(null);
   const [activeScrollId, setActiveScrollId] = useState(milestones[0].id);
   const [isRequestingCallback, setIsRequestingCallback] = useState(false);
-  const [callbackRequestCount, setCallbackRequestCount] = useState(() => {
-    const raw = window.localStorage.getItem(CALLBACK_REQUEST_STORAGE_KEY);
-    const parsed = Number.parseInt(raw || "0", 10);
-    if (!Number.isFinite(parsed) || parsed < 0) return 0;
-    return Math.min(parsed, MAX_CALLBACK_REQUESTS);
-  });
+  const [callbackRequestCount, setCallbackRequestCount] = useState(() =>
+    getInitialCallbackRequestCount(CALLBACK_REQUEST_STORAGE_KEY, MAX_CALLBACK_REQUESTS),
+  );
   const [hasRequestedCallback, setHasRequestedCallback] = useState(false);
   const [showCallbackPopup, setShowCallbackPopup] = useState(false);
   const [callbackRequestError, setCallbackRequestError] = useState("");
@@ -325,7 +123,7 @@ export function TimelineScreen({ primaryCtaText = "Start this journey" }) {
       setHasRequestedCallback(true);
       setShowCallbackPopup(true);
     } catch {
-      setCallbackRequestError("Could not raise callback request. Please try again.");
+      setCallbackRequestError(callback.error);
     } finally {
       setIsRequestingCallback(false);
     }
@@ -335,12 +133,9 @@ export function TimelineScreen({ primaryCtaText = "Start this journey" }) {
     <section className="screen default-screen timeline-screen">
       <main className="shell">
         <header className="hero">
-          <div className="eyebrow">Your 12-month roadmap to</div>
-          <h1 className="headline">Learning and Building, with and from, AI.</h1>
-          <p className="subcopy">
-            TL;DR: Meet and greet orientation session, foundational modules, core modules, choose a
-            specialization, placements, and mentor check-ins all along the way.
-          </p>
+          <div className="eyebrow">{hero.eyebrow}</div>
+          <h1 className="headline">{hero.title}</h1>
+          <p className="subcopy">{hero.subcopy}</p>
         </header>
         <div className="roadmap-layout">
           <section className="timeline roadmap-timeline" id="timeline-start">
@@ -361,7 +156,7 @@ export function TimelineScreen({ primaryCtaText = "Start this journey" }) {
                 </>
               );
 
-              const content = (
+              const milestoneContent = (
                 <div className={`roadmap-content roadmap-content--${milestone.side}`}>
                   <div className="roadmap-time">{milestone.time}</div>
                   <h2 className="roadmap-title">{milestone.title}</h2>
@@ -379,7 +174,7 @@ export function TimelineScreen({ primaryCtaText = "Start this journey" }) {
                 milestone.expandable && milestone.image ? (
                   <div className="roadmap-expand-panel">
                     <div className="roadmap-expand-shell">
-                      <p className="roadmap-expand-label">Milestone walkthrough</p>
+                      <p className="roadmap-expand-label">{expandPanelLabel}</p>
                       <h3 className="roadmap-expand-title">{milestone.expandTitle || milestone.title}</h3>
                       <div className="roadmap-expand-gallery">
                         {milestone.carouselSlides?.length ? (
@@ -442,7 +237,7 @@ export function TimelineScreen({ primaryCtaText = "Start this journey" }) {
                 >
                   {/* Always node then card so mobile 2-col grid places marker + card on one row (left used to be card+node and broke alignment). */}
                   {center}
-                  {content}
+                  {milestoneContent}
                   {expandPanel}
                 </article>
               );
@@ -467,7 +262,12 @@ export function TimelineScreen({ primaryCtaText = "Start this journey" }) {
           onClick={handleRequestCallback}
           disabled={isRequestingCallback || hasReachedCallbackLimit || hasRequestedCallback}
         >
-          {requestCallBackCTAText(hasRequestedCallback, isRequestingCallback, hasReachedCallbackLimit)}
+          {getRequestCallbackCtaText({
+            hasRequestedCallback,
+            isRequestingCallback,
+            hasReachedCallbackLimit,
+            callbackContent: callback,
+          })}
         </button>
         {callbackRequestError ? (
           <p className="roadmap-callback-error" role="status" aria-live="polite">
@@ -489,16 +289,14 @@ export function TimelineScreen({ primaryCtaText = "Start this journey" }) {
             aria-describedby="roadmap-callback-popup-copy"
             onClick={(event) => event.stopPropagation()}
           >
-            <h2 id="roadmap-callback-popup-title">Request raised</h2>
-            <p id="roadmap-callback-popup-copy">
-              Your dedicated learning success manager will contact you within 24 - 48hrs
-            </p>
+            <h2 id="roadmap-callback-popup-title">{callback.popupTitle}</h2>
+            <p id="roadmap-callback-popup-copy">{callback.popupCopy}</p>
             <button
               type="button"
               className="roadmap-popup-button"
               onClick={() => setShowCallbackPopup(false)}
             >
-              Okay
+              {callback.popupButtonLabel}
             </button>
           </div>
         </div>
