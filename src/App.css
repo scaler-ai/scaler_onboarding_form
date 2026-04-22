@@ -584,6 +584,7 @@
   color: var(--letter-black);
   font-size: 13px;
   font-weight: 700;
+  padding-bottom: 1px;
 }
 
 .letter-screen .org-logo {

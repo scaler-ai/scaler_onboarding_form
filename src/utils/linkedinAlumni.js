@@ -206,9 +206,9 @@ export function getLinkedinAlumniProfileByIdentifier(nameOrEmail) {
 const ONLINE_MBA_ALUMNI_PROFILES = {
   namanBhalla: {
     name: "Naman Bhalla",
-    role: "AI Product Head · Google",
+    role: "AI Product Head · Scaler",
     before: "Strategy & AI Integration",
-    company: "Google",
+    company: "Scaler",
     photo: "https://d2beiqkhq929f0.cloudfront.net/public_assets/assets/000/192/044/original/freepik_make-a-picture-of-img1-pe_2840917494.png?1776858908",
   },
   amarSrivastav: {
