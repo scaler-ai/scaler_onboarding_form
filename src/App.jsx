@@ -9,6 +9,8 @@ import { LoadingScreen } from "./components/LoadingScreen";
 import { HomeScreen } from "./components/HomeScreen";
 import { FinalLetterScreen } from "./components/FinalLetterScreen";
 import { TimelineScreen } from "./components/TimelineScreen";
+import { RoadmapActionsScreen } from "./components/RoadmapActions";
+import { shouldShowTimeline } from "./constants/timelineContent";
 import { ExpectationSettingScreen } from "./components/ExpectationSettingScreen";
 import { useOnboardingData } from "./hooks/useOnboardingData";
 import { useOnboardingForm } from "./hooks/useOnboardingForm";
@@ -32,6 +34,7 @@ function App() {
   } = useOnboardingData();
   const onboarding = useOnboardingForm({ screens, formGroupLabel });
   const [phase, setPhase] = useState("home");
+  const showTimeline = shouldShowTimeline(formGroupLabel);
 
   /** Full-screen phases share one document scroll; reset when switching so letter/timeline don’t inherit form scroll. */
   useLayoutEffect(() => {
@@ -193,7 +196,11 @@ function App() {
   }
 
   if (phase === "timeline") {
-    return <TimelineScreen formGroupLabel={formGroupLabel} primaryCtaText={timelineFloatingCta.primary} />;
+    return showTimeline ? (
+      <TimelineScreen formGroupLabel={formGroupLabel} primaryCtaText={timelineFloatingCta.primary} />
+    ) : (
+      <RoadmapActionsScreen formGroupLabel={formGroupLabel} primaryCtaText={timelineFloatingCta.primary} />
+    );
   }
 
   if (!onboarding.currentScreen) {

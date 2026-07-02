@@ -401,3 +401,13 @@ export const TIMELINE_CONTENT_BY_FORM_GROUP_LABEL = {
 export function getTimelineContent(formGroupLabel) {
   return TIMELINE_CONTENT_BY_FORM_GROUP_LABEL[formGroupLabel] || DEFAULT_TIMELINE_CONTENT;
 }
+
+/** Form groups where the roadmap/timeline screen is intentionally skipped (letter is terminal). */
+const TIMELINE_HIDDEN_FORM_GROUP_LABELS = new Set([
+  "Onboarding_Form_IIT_Roorkee_V3",
+  "Onboarding_Form_IIM_Trichy_V3",
+]);
+
+export function shouldShowTimeline(formGroupLabel) {
+  return !TIMELINE_HIDDEN_FORM_GROUP_LABELS.has(formGroupLabel);
+}
