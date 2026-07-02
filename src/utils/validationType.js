@@ -18,6 +18,9 @@ const COUNTRY_CODE_RE = /^\+?[1-9]\d{0,3}$/;
 const LINKEDIN_RE =
   /^https?:\/\/(www\.)?linkedin\.com\/(in|pub|company|school|showcase)\/[^/\s]+\/?(\?.*)?$/i;
 
+/** Person name: starts with a letter, then letters plus spaces, hyphens, apostrophes (e.g. "Mary-Jane O'Brien"). No digits or other symbols. */
+const NAME_RE = /^[A-Za-z][A-Za-z '-]*$/;
+
 export const VALIDATION_TYPES = [
   "email",
   "date_of_birth",
@@ -101,19 +104,38 @@ export function validateByMetaType(validationType, rawValue) {
   }
 }
 
+/** Fields whose `linked_attribute` marks them as a person name that must be alphabetic. */
+export function isAlphabeticNameField(field) {
+  return field?.linkedAttribute === "guardian_first_name";
+}
+
 /**
- * react-hook-form options for text-like fields when `field.validationType` is set from meta.
+ * react-hook-form options for text-like fields.
+ * Composes required, `field.validationType` (from meta), and name-only rules
+ * (for fields identified by their `linked_attribute`).
  */
 export function getRegisterOptionsForValidationType(field) {
-  if (!field.validationType) {
+  const checks = [];
+  if (field.validationType) {
+    checks.push((s) => validateByMetaType(field.validationType, s));
+  }
+  if (isAlphabeticNameField(field)) {
+    checks.push((s) => (NAME_RE.test(s) ? true : "Name can only contain letters."));
+  }
+
+  if (checks.length === 0) {
     return { required: field.required ? "This field is required." : false };
   }
+
   return {
     validate: (value) => {
       const s = String(value ?? "").trim();
       if (!s) return field.required ? "This field is required." : true;
-      const err = validateByMetaType(field.validationType, s);
-      return err === true ? true : err;
+      for (const check of checks) {
+        const result = check(s);
+        if (result !== true) return result;
+      }
+      return true;
     },
   };
 }

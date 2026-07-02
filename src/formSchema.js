@@ -186,6 +186,9 @@ function normalizeField(field, index) {
     layoutWidth,
     layoutSpan,
     validationType,
+    /** Model mapping from the interviewbit_form payload; used to identify fields (e.g. guardian name). */
+    linkedAttribute: field.linked_attribute ?? null,
+    linkedClass: field.linked_class ?? null,
   };
 }
 
