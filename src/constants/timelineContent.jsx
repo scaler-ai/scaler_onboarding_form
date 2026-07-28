@@ -406,6 +406,7 @@ export function getTimelineContent(formGroupLabel) {
 const TIMELINE_HIDDEN_FORM_GROUP_LABELS = new Set([
   "Onboarding_Form_IIT_Roorkee_V3",
   "Onboarding_Form_IIM_Trichy_V3",
+  "Onboarding_Form_FDE_V3",
 ]);
 
 export function shouldShowTimeline(formGroupLabel) {

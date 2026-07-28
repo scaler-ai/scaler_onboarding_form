@@ -12,6 +12,7 @@ export const COURSE_TYPES = {
   onlineMba: "online_mba",
   iit_roorkee: "iit_roorkee",
   iim_trichy: "iim_trichy",
+  fde: "fde",
 };
 
 /** `label[]` for `/api/v3/interviewbit_form_groups?search_by=label&label[]=…`. */
@@ -23,6 +24,7 @@ export const ONBOARDING_FORM_TYPES_V3 = {
   [COURSE_TYPES.onlineMba]: "Onboarding_Form_Online_MBA_V3",
   [COURSE_TYPES.iit_roorkee]: "Onboarding_Form_IIT_Roorkee_V3",
   [COURSE_TYPES.iim_trichy]: "Onboarding_Form_IIM_Trichy_V3",
+  [COURSE_TYPES.fde]: "Onboarding_Form_FDE_V3",
 };
 
 export function getOnboardingFormGroupLabelV3(courseSlug) {
@@ -70,6 +72,7 @@ export const HOME_SCREEN_CONTENT_BY_FORM_GROUP_LABEL = {
   Onboarding_Form_Online_MBA_V3: ONLINE_MBA_HOME_SCREEN_CONTENT,
   Onboarding_Form_IIT_Roorkee_V3: DEFAULT_HOME_SCREEN_CONTENT,
   Onboarding_Form_IIM_Trichy_V3: DEFAULT_HOME_SCREEN_CONTENT,
+  Onboarding_Form_FDE_V3: DEFAULT_HOME_SCREEN_CONTENT,
 };
 
 export const EXPECTATION_FORM_ENABLED_COURSES = [
@@ -77,4 +80,5 @@ export const EXPECTATION_FORM_ENABLED_COURSES = [
   COURSE_TYPES.dataScience,
   COURSE_TYPES.devops,
   COURSE_TYPES.ai_ml,
+  COURSE_TYPES.fde,
 ];
