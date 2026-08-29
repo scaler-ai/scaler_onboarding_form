@@ -27,11 +27,11 @@ export const ONBOARDING_FORM_TYPES_V3 = {
   [COURSE_TYPES.fde]: "Onboarding_Form_FDE_V3",
 };
 
-export function getOnboardingFormGroupLabelV3(courseSlug) {
+export function getOnboardingFormGroupLabelV3(courseSlug, backendLabel) {
   if (courseSlug && ONBOARDING_FORM_TYPES_V3[courseSlug]) {
     return ONBOARDING_FORM_TYPES_V3[courseSlug];
   }
-  return ONBOARDING_FORM_TYPES_V3[COURSE_TYPES.scalerAcademy];
+  return backendLabel || ONBOARDING_FORM_TYPES_V3[COURSE_TYPES.scalerAcademy];
 }
 
 export const DEFAULT_HOME_SCREEN_CONTENT = {

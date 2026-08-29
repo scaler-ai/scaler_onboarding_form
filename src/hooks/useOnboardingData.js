@@ -14,10 +14,12 @@ export function useOnboardingData() {
   });
 
   const courseSlug = initialQuery.data?.initialLoadData?.user_data?.course_slug;
+  const backendFormLabel =
+    initialQuery.data?.initialLoadData?.user_data?.onboarding_form_group_label;
 
   const formGroupQuery = useQuery({
-    queryKey: ["onboarding-form-group", courseSlug ?? "default"],
-    queryFn: () => fetchOnboardingFormGroup(courseSlug),
+    queryKey: ["onboarding-form-group", courseSlug ?? backendFormLabel ?? "default"],
+    queryFn: () => fetchOnboardingFormGroup(courseSlug, backendFormLabel),
     enabled: initialQuery.isSuccess,
     ...oneTimeFetchOptions,
   });
