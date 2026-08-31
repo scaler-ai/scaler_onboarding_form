@@ -35,8 +35,8 @@ export async function fetchInitialLoadWithCompletionDecision() {
   };
 }
 
-export function fetchOnboardingFormGroup(courseSlug) {
-  const label = getOnboardingFormGroupLabelV3(courseSlug);
+export function fetchOnboardingFormGroup(courseSlug, backendLabel) {
+  const label = getOnboardingFormGroupLabelV3(courseSlug, backendLabel);
   return apiFetch(getInterviewbitFormGroupsPath(label));
 }
 
