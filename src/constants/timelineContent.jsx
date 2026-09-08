@@ -395,6 +395,7 @@ export const TIMELINE_CONTENT_BY_FORM_GROUP_LABEL = {
   Onboarding_Form_DSML_V3: DEFAULT_TIMELINE_CONTENT,
   Onboarding_Form_Devops_V3: DEFAULT_TIMELINE_CONTENT,
   Onboarding_Form_AI_ML_V3: DEFAULT_TIMELINE_CONTENT,
+  Onboarding_Form_FDE_V3: DEFAULT_TIMELINE_CONTENT,
   Onboarding_Form_Online_MBA_V3: ONLINE_MBA_TIMELINE_CONTENT,
 };
 
@@ -406,7 +407,6 @@ export function getTimelineContent(formGroupLabel) {
 const TIMELINE_HIDDEN_FORM_GROUP_LABELS = new Set([
   "Onboarding_Form_IIT_Roorkee_V3",
   "Onboarding_Form_IIM_Trichy_V3",
-  "Onboarding_Form_FDE_V3",
 ]);
 
 export function shouldShowTimeline(formGroupLabel) {
